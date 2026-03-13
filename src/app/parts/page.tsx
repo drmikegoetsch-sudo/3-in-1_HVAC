@@ -18,7 +18,7 @@ export default async function PartsPage({
   const { data: items } = await supabase
     .from('follow_up_detail')
     .select('*')
-    .eq('status', activeTab)
+    .eq('status', activeTab as 'needs_pricing' | 'approved_order_part' | 'waiting_on_part')
     .eq('requires_part', true)
     .order('due_date', { ascending: true })
 

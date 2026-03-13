@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import type { Database } from '@/lib/database.types'
 import Link from 'next/link'
 
 const STATUS_LABELS: Record<string, string> = {
@@ -47,7 +48,7 @@ export default async function FollowUpsPage({
     .select('*')
     .order('due_date', { ascending: true, nullsFirst: false })
 
-  if (params.status) query = query.eq('status', params.status)
+  if (params.status) query = query.eq('status', params.status as Database['public']['Enums']['follow_up_status'])
 
   const { data: items } = await query
 
