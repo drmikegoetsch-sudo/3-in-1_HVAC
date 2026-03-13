@@ -1,65 +1,97 @@
-import Image from "next/image";
+import { supabase } from '@/lib/supabase'
+import Link from 'next/link'
 
-export default function Home() {
+const STATUSES = [
+  { key: 'needs_pricing',          label: 'Needs Pricing' },
+  { key: 'waiting_quote_approval', label: 'Awaiting Approval' },
+  { key: 'approved_order_part',    label: 'Order Part' },
+  { key: 'waiting_on_part',        label: 'Waiting on Part' },
+  { key: 'ready_to_schedule',      label: 'Ready to Schedule' },
+  { key: 'waiting_on_customer',    label: 'Waiting on Customer' },
+  { key: 'billing_followup',       label: 'Billing Follow-Up' },
+]
+
+export default async function DashboardPage() {
+  const { data: summary } = await supabase
+    .from('open_follow_ups_summary')
+    .select('*')
+
+  const counts: Record<string, { total: number; overdue: number }> = {}
+  for (const row of summary ?? []) {
+    const s = row.status!
+    if (!counts[s]) counts[s] = { total: 0, overdue: 0 }
+    counts[s].total += row.total ?? 0
+    counts[s].overdue += row.overdue ?? 0
+  }
+
+  const totalOpen = Object.values(counts).reduce((a, b) => a + b.total, 0)
+  const activeStatuses = STATUSES.filter(({ key }) => (counts[key]?.total ?? 0) > 0)
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="p-4 md:p-8 max-w-lg">
+      {/* Header */}
+      <div className="flex items-start justify-between mb-7">
+        <div>
+          <h1 className="text-[22px] font-semibold text-[#1d1d1f] tracking-tight">Good morning</h1>
+          <p className="text-[14px] text-[#6e6e73] mt-0.5">
+            {totalOpen === 0
+              ? 'Everything is caught up.'
+              : `${totalOpen} item${totalOpen !== 1 ? 's' : ''} need attention`}
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <Link
+          href="/follow-ups/new"
+          className="inline-flex items-center gap-2 h-9 px-4 bg-[#f26a1b] hover:bg-[#d4560d] active:bg-[#c24e0b] text-white text-[13px] font-semibold rounded-[10px] transition-colors shrink-0 tracking-[-0.01em] shadow-[0_1px_2px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.12)]"
+        >
+          <span className="text-[19px] font-light leading-none -mt-px">+</span>
+          New Follow-Up
+        </Link>
+      </div>
+
+      {activeStatuses.length === 0 ? (
+        <div className="text-center py-16">
+          <div className="text-[28px] mb-2 text-[#c7c7cc]">✓</div>
+          <div className="text-[13px] text-[#8e8e93]">Nothing open</div>
         </div>
-      </main>
+      ) : (
+        <div
+          className="bg-white rounded-[12px] overflow-hidden"
+          style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)' }}
+        >
+          {activeStatuses.map(({ key, label }, index) => {
+            const c = counts[key] ?? { total: 0, overdue: 0 }
+            const isLast = index === activeStatuses.length - 1
+            return (
+              <Link
+                key={key}
+                href={`/follow-ups?status=${key}`}
+                className={`flex items-center justify-between px-4 py-[11px] hover:bg-[#f9f9fb] active:bg-[#f5f5f7] transition-colors ${
+                  !isLast ? 'border-b border-[#f2f2f7]' : ''
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`w-[7px] h-[7px] rounded-full shrink-0 ${
+                      c.overdue > 0 ? 'bg-red-400' : 'bg-[#d1d1d6]'
+                    }`}
+                  />
+                  <span className="text-[14px] text-[#1d1d1f]">{label}</span>
+                  {c.overdue > 0 && (
+                    <span className="text-[11px] text-red-500 font-medium tabular-nums">
+                      {c.overdue} overdue
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[14px] font-semibold text-[#1d1d1f] tabular-nums">{c.total}</span>
+                  <span className="text-[#c7c7cc] text-[13px] leading-none">›</span>
+                </div>
+              </Link>
+            )
+          })}
+        </div>
+      )}
+
     </div>
-  );
+  )
 }
