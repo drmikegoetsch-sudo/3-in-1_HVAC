@@ -1,26 +1,67 @@
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 
-export default async function BillingPage() {
-  const { data: items } = await supabase
-    .from('follow_up_detail')
-    .select('*')
-    .is('archived_at', null)
-    .neq('status', 'closed' as never)
-    .or('status.eq.billing_followup,category.eq.billing,category.eq.payment')
-    .order('due_date', { ascending: true })
+export default async function BillingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ closed?: string }>
+}) {
+  const params = await searchParams
+  const isClosedView = params.closed === '1'
+
+  const { data: items } = isClosedView
+    ? await supabase
+        .from('follow_up_detail')
+        .select('*')
+        .is('archived_at', null)
+        .eq('status', 'closed' as never)
+        .or('category.eq.billing,category.eq.payment')
+        .order('due_date', { ascending: false })
+    : await supabase
+        .from('follow_up_detail')
+        .select('*')
+        .is('archived_at', null)
+        .neq('status', 'closed' as never)
+        .or('status.eq.billing_followup,category.eq.billing,category.eq.payment')
+        .order('due_date', { ascending: true })
 
   return (
     <div className="p-4 md:p-8 max-w-2xl">
-      <div className="mb-7">
+      <div className="mb-5">
         <h1 className="text-[22px] font-semibold text-[#1d1d1f] tracking-tight">Billing</h1>
         <p className="text-[13px] text-[#6e6e73] mt-0.5">Outstanding invoices and payment follow-ups</p>
+      </div>
+
+      {/* Active / Closed toggle */}
+      <div className="flex gap-1.5 mb-7">
+        <Link
+          href="/billing"
+          className={`px-3 py-1 rounded-full text-[12px] font-medium border transition-colors ${
+            !isClosedView
+              ? 'bg-[#1d1d1f] text-white border-transparent'
+              : 'bg-white text-[#6e6e73] border-[#d1d1d6] hover:text-[#1d1d1f] hover:border-[#8e8e93]'
+          }`}
+        >
+          Active
+        </Link>
+        <Link
+          href="/billing?closed=1"
+          className={`px-3 py-1 rounded-full text-[12px] font-medium border transition-colors ${
+            isClosedView
+              ? 'bg-[#1d1d1f] text-white border-transparent'
+              : 'bg-white text-[#6e6e73] border-[#d1d1d6] hover:text-[#1d1d1f] hover:border-[#8e8e93]'
+          }`}
+        >
+          Closed
+        </Link>
       </div>
 
       {!items?.length ? (
         <div className="text-center py-16">
           <div className="text-[28px] mb-2 text-[#c7c7cc]">✓</div>
-          <div className="text-[13px] text-[#8e8e93]">No billing follow-ups</div>
+          <div className="text-[13px] text-[#8e8e93]">
+            {isClosedView ? 'No closed billing items' : 'No billing follow-ups'}
+          </div>
         </div>
       ) : (
         <div
@@ -28,7 +69,7 @@ export default async function BillingPage() {
           style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)' }}
         >
           {items.map((item, index) => {
-            const overdue = item.due_date && new Date(item.due_date) < new Date(new Date().toDateString())
+            const overdue = !isClosedView && item.due_date && new Date(item.due_date) < new Date(new Date().toDateString())
             const isLast = index === items.length - 1
             return (
               <Link
