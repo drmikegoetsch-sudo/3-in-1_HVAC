@@ -115,7 +115,8 @@ export default function NewFollowUpPage() {
 
       router.push(`/follow-ups/${item.id}`)
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Something went wrong')
+      const msg = err instanceof Error ? err.message : (err as { message?: string })?.message ?? 'Something went wrong'
+      setError(msg)
       setLoading(false)
     }
   }
