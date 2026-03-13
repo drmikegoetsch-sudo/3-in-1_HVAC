@@ -28,7 +28,7 @@ export default async function DashboardPage() {
   const activeStatuses = STATUSES.filter(({ key }) => (counts[key]?.total ?? 0) > 0)
 
   return (
-    <div className="p-4 md:p-8 max-w-lg">
+    <div className="p-4 md:p-8">
       {/* Header */}
       <div className="flex items-start justify-between mb-7">
         <div>
@@ -48,6 +48,7 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
+      <div className="max-w-lg">
       {activeStatuses.length === 0 ? (
         <div className="text-center py-16">
           <div className="text-[28px] mb-2 text-[#c7c7cc]">✓</div>
@@ -91,7 +92,7 @@ export default async function DashboardPage() {
           })}
         </div>
       )}
-
+      </div>
     </div>
   )
 }
