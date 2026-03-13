@@ -2,13 +2,13 @@ import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 
 const STATUSES = [
-  { key: 'needs_pricing',          label: 'Needs Pricing' },
-  { key: 'waiting_quote_approval', label: 'Awaiting Approval' },
-  { key: 'approved_order_part',    label: 'Order Part' },
-  { key: 'waiting_on_part',        label: 'Waiting on Part' },
-  { key: 'ready_to_schedule',      label: 'Ready to Schedule' },
-  { key: 'waiting_on_customer',    label: 'Waiting on Customer' },
-  { key: 'billing_followup',       label: 'Billing Follow-Up' },
+  { key: 'needs_pricing',          label: 'Needs Pricing',        href: '/follow-ups?status=needs_pricing' },
+  { key: 'waiting_quote_approval', label: 'Awaiting Approval',    href: '/follow-ups?status=waiting_quote_approval' },
+  { key: 'approved_order_part',    label: 'Order Part',           href: '/parts?tab=approved_order_part' },
+  { key: 'waiting_on_part',        label: 'Waiting on Part',      href: '/parts?tab=waiting_on_part' },
+  { key: 'ready_to_schedule',      label: 'Ready to Schedule',    href: '/schedule' },
+  { key: 'waiting_on_customer',    label: 'Waiting on Customer',  href: '/follow-ups?status=waiting_on_customer' },
+  { key: 'billing_followup',       label: 'Billing Follow-Up',    href: '/billing' },
 ]
 
 export default async function DashboardPage() {
@@ -58,13 +58,13 @@ export default async function DashboardPage() {
           className="bg-white rounded-[12px] overflow-hidden"
           style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)' }}
         >
-          {activeStatuses.map(({ key, label }, index) => {
+          {activeStatuses.map(({ key, label, href }, index) => {
             const c = counts[key] ?? { total: 0, overdue: 0 }
             const isLast = index === activeStatuses.length - 1
             return (
               <Link
                 key={key}
-                href={`/follow-ups?status=${key}`}
+                href={href}
                 className={`flex items-center justify-between px-4 py-[11px] hover:bg-[#f9f9fb] active:bg-[#f5f5f7] transition-colors ${
                   !isLast ? 'border-b border-[#f2f2f7]' : ''
                 }`}

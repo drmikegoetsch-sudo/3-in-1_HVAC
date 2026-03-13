@@ -2,15 +2,11 @@ import { supabase } from '@/lib/supabase'
 import type { Database } from '@/lib/database.types'
 import Link from 'next/link'
 
+// Only statuses that live in Follow-Ups (others route to Parts/Schedule/Billing)
 const STATUS_LABELS: Record<string, string> = {
   needs_pricing:          'Needs Pricing',
   waiting_quote_approval: 'Awaiting Approval',
-  approved_order_part:    'Order Part',
-  waiting_on_part:        'Waiting on Part',
-  ready_to_schedule:      'Ready to Schedule',
   waiting_on_customer:    'Waiting on Customer',
-  scheduled:              'Scheduled',
-  billing_followup:       'Billing Follow-Up',
   closed:                 'Closed',
 }
 
@@ -45,16 +41,28 @@ export default async function FollowUpsPage({
   const params = await searchParams
   const isClosedView = params.status === 'closed'
 
+  // Statuses that belong in other sections, not Follow-Ups
+  const SECTION_STATUSES = ['billing_followup', 'approved_order_part', 'waiting_on_part', 'ready_to_schedule', 'scheduled'] as const
+
   let query = supabase
     .from('follow_up_detail')
     .select('*')
     .is('archived_at', null)
+    // Always exclude billing/payment category — those live in the Billing section
+    .neq('category', 'billing' as never)
+    .neq('category', 'payment' as never)
     .order('due_date', { ascending: true, nullsFirst: false })
 
-  if (params.status) {
+  if (isClosedView) {
+    query = query.eq('status', 'closed' as Database['public']['Enums']['follow_up_status'])
+  } else if (params.status) {
     query = query.eq('status', params.status as Database['public']['Enums']['follow_up_status'])
   } else {
+    // All active: exclude closed and statuses that belong in other sections
     query = query.neq('status', 'closed' as Database['public']['Enums']['follow_up_status'])
+    for (const s of SECTION_STATUSES) {
+      query = query.neq('status', s as Database['public']['Enums']['follow_up_status'])
+    }
   }
 
   const { data: items } = await query

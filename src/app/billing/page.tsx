@@ -5,7 +5,9 @@ export default async function BillingPage() {
   const { data: items } = await supabase
     .from('follow_up_detail')
     .select('*')
-    .eq('status', 'billing_followup')
+    .is('archived_at', null)
+    .neq('status', 'closed' as never)
+    .or('status.eq.billing_followup,category.eq.billing,category.eq.payment')
     .order('due_date', { ascending: true })
 
   return (

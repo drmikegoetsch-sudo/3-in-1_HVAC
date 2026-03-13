@@ -5,11 +5,13 @@ export default async function SchedulePage() {
   const { data: items } = await supabase
     .from('follow_up_detail')
     .select('*')
-    .in('status', ['ready_to_schedule', 'waiting_on_customer'])
+    .is('archived_at', null)
+    .in('status', ['ready_to_schedule', 'waiting_on_customer', 'scheduled'])
     .order('due_date', { ascending: true })
 
-  const ready   = items?.filter(i => i.status === 'ready_to_schedule') ?? []
-  const waiting = items?.filter(i => i.status === 'waiting_on_customer') ?? []
+  const ready     = items?.filter(i => i.status === 'ready_to_schedule') ?? []
+  const waiting   = items?.filter(i => i.status === 'waiting_on_customer') ?? []
+  const scheduled = items?.filter(i => i.status === 'scheduled') ?? []
 
   function ItemList({ list }: { list: typeof ready }) {
     if (list.length === 0) {
@@ -75,13 +77,22 @@ export default async function SchedulePage() {
         <ItemList list={ready} />
       </div>
 
-      <div>
+      <div className="mb-7">
         <div className="flex items-center gap-2 mb-3">
           <span className="w-2 h-2 rounded-full bg-[#d1d1d6]" />
           <span className="text-[13px] font-semibold text-[#1d1d1f]">Waiting on Customer</span>
           <span className="text-[11px] font-semibold text-[#8e8e93]">{waiting.length}</span>
         </div>
         <ItemList list={waiting} />
+      </div>
+
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <span className="w-2 h-2 rounded-full bg-teal-400" />
+          <span className="text-[13px] font-semibold text-[#1d1d1f]">Scheduled</span>
+          <span className="text-[11px] font-semibold text-[#8e8e93]">{scheduled.length}</span>
+        </div>
+        <ItemList list={scheduled} />
       </div>
     </div>
   )
