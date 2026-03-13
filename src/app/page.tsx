@@ -48,7 +48,6 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      <div className="max-w-lg">
       {activeStatuses.length === 0 ? (
         <div className="text-center py-16">
           <div className="text-[28px] mb-2 text-[#c7c7cc]">✓</div>
@@ -56,7 +55,7 @@ export default async function DashboardPage() {
         </div>
       ) : (
         <div
-          className="bg-white rounded-[12px] overflow-hidden"
+          className="max-w-lg bg-white rounded-[12px] overflow-hidden"
           style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)' }}
         >
           {activeStatuses.map(({ key, label, href }, index) => {
@@ -92,7 +91,6 @@ export default async function DashboardPage() {
           })}
         </div>
       )}
-      </div>
     </div>
   )
 }
