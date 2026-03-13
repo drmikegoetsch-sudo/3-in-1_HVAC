@@ -43,12 +43,19 @@ export default async function FollowUpsPage({
   searchParams: Promise<{ status?: string }>
 }) {
   const params = await searchParams
+  const isClosedView = params.status === 'closed'
+
   let query = supabase
     .from('follow_up_detail')
     .select('*')
+    .is('archived_at', null)
     .order('due_date', { ascending: true, nullsFirst: false })
 
-  if (params.status) query = query.eq('status', params.status as Database['public']['Enums']['follow_up_status'])
+  if (params.status) {
+    query = query.eq('status', params.status as Database['public']['Enums']['follow_up_status'])
+  } else {
+    query = query.neq('status', 'closed' as Database['public']['Enums']['follow_up_status'])
+  }
 
   const { data: items } = await query
 
@@ -58,7 +65,9 @@ export default async function FollowUpsPage({
       <div className="flex items-center justify-between mb-5">
         <div>
           <h1 className="text-[22px] font-semibold text-[#1d1d1f] tracking-tight">Follow-Ups</h1>
-          <p className="text-[13px] text-[#6e6e73] mt-0.5">{items?.length ?? 0} open items</p>
+          <p className="text-[13px] text-[#6e6e73] mt-0.5">
+            {isClosedView ? `${items?.length ?? 0} closed items` : `${items?.length ?? 0} open items`}
+          </p>
         </div>
         <Link
           href="/follow-ups/new"
@@ -94,13 +103,23 @@ export default async function FollowUpsPage({
             {v}
           </Link>
         ))}
+        <Link
+          href="/follow-ups?status=closed"
+          className={`px-3 py-1 rounded-full text-[12px] font-medium border transition-colors whitespace-nowrap ${
+            isClosedView
+              ? 'bg-[#1d1d1f] text-white border-transparent'
+              : 'bg-white text-[#6e6e73] border-[#d1d1d6] hover:text-[#1d1d1f] hover:border-[#8e8e93]'
+          }`}
+        >
+          Closed
+        </Link>
       </div>
 
       {/* List */}
       {!items?.length ? (
         <div className="text-center py-20">
           <div className="text-[28px] mb-2 text-[#c7c7cc]">✓</div>
-          <div className="text-[13px] text-[#8e8e93]">No open follow-ups</div>
+          <div className="text-[13px] text-[#8e8e93]">{isClosedView ? 'No closed items' : 'No open follow-ups'}</div>
         </div>
       ) : (
         <div
