@@ -1,20 +1,11 @@
 import { supabase } from '@/lib/supabase'
+import { STATUS_LABELS, STATUS_BADGE } from '@/lib/constants'
 import { notFound } from 'next/navigation'
 import StatusUpdater from './StatusUpdater'
 import CommunicationLogger from './CommunicationLogger'
 import ArchiveButton from './ArchiveButton'
 
-const STATUS_LABELS: Record<string, string> = {
-  needs_pricing:          'Needs Pricing',
-  waiting_quote_approval: 'Awaiting Approval',
-  approved_order_part:    'Order Part',
-  waiting_on_part:        'Waiting on Part',
-  ready_to_schedule:      'Ready to Schedule',
-  waiting_on_customer:    'Waiting on Customer',
-  scheduled:              'Scheduled',
-  billing_followup:       'Billing Follow-Up',
-  closed:                 'Closed',
-}
+export const revalidate = 0 // always fresh for detail pages
 
 const STATUS_TRANSITIONS: Record<string, string[]> = {
   needs_pricing:          ['waiting_quote_approval', 'ready_to_schedule', 'closed'],
@@ -28,23 +19,11 @@ const STATUS_TRANSITIONS: Record<string, string[]> = {
   closed:                 [],
 }
 
-const STATUS_BADGE: Record<string, string> = {
-  needs_pricing:          'bg-amber-50 text-amber-600',
-  waiting_quote_approval: 'bg-blue-50 text-blue-600',
-  approved_order_part:    'bg-orange-50 text-[#f26a1b]',
-  waiting_on_part:        'bg-purple-50 text-purple-600',
-  ready_to_schedule:      'bg-emerald-50 text-emerald-600',
-  waiting_on_customer:    'bg-[#f5f5f7] text-[#6e6e73]',
-  scheduled:              'bg-teal-50 text-teal-600',
-  billing_followup:       'bg-red-50 text-red-500',
-  closed:                 'bg-[#f5f5f7] text-[#8e8e93]',
-}
-
 function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
     <div
       className={`bg-white rounded-[12px] ${className}`}
-      style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04)' }}
+      style={{ boxShadow: 'var(--card-shadow)' }}
     >
       {children}
     </div>

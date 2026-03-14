@@ -1,6 +1,9 @@
 import { supabase } from '@/lib/supabase'
+import { STATUS_BADGE, PRIORITY_BADGE, SECTION_STATUSES, isOverdue } from '@/lib/constants'
 import type { Database } from '@/lib/database.types'
 import Link from 'next/link'
+
+export const revalidate = 30
 
 // Only statuses that live in Follow-Ups (others route to Parts/Schedule/Billing)
 const STATUS_LABELS: Record<string, string> = {
@@ -10,29 +13,6 @@ const STATUS_LABELS: Record<string, string> = {
   closed:                 'Closed',
 }
 
-const STATUS_BADGE: Record<string, string> = {
-  needs_pricing:          'bg-amber-50 text-amber-600',
-  waiting_quote_approval: 'bg-blue-50 text-blue-600',
-  approved_order_part:    'bg-orange-50 text-[#f26a1b]',
-  waiting_on_part:        'bg-purple-50 text-purple-600',
-  ready_to_schedule:      'bg-emerald-50 text-emerald-600',
-  waiting_on_customer:    'bg-[#f5f5f7] text-[#6e6e73]',
-  scheduled:              'bg-teal-50 text-teal-600',
-  billing_followup:       'bg-red-50 text-red-500',
-  closed:                 'bg-[#f5f5f7] text-[#8e8e93]',
-}
-
-const PRIORITY_BADGE: Record<string, string> = {
-  urgent:   'bg-red-50 text-red-500',
-  standard: 'bg-[#f5f5f7] text-[#6e6e73]',
-  low:      'bg-[#f5f5f7] text-[#8e8e93]',
-}
-
-function isOverdue(dueDate: string | null) {
-  if (!dueDate) return false
-  return new Date(dueDate) < new Date(new Date().toDateString())
-}
-
 export default async function FollowUpsPage({
   searchParams,
 }: {
@@ -40,9 +20,6 @@ export default async function FollowUpsPage({
 }) {
   const params = await searchParams
   const isClosedView = params.status === 'closed'
-
-  // Statuses that belong in other sections, not Follow-Ups
-  const SECTION_STATUSES = ['billing_followup', 'approved_order_part', 'waiting_on_part', 'ready_to_schedule', 'scheduled'] as const
 
   let query = supabase
     .from('follow_up_detail')
@@ -132,7 +109,7 @@ export default async function FollowUpsPage({
       ) : (
         <div
           className="bg-white rounded-[12px] overflow-hidden"
-          style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)' }}
+          style={{ boxShadow: 'var(--card-shadow)' }}
         >
           {/* Table header — desktop only */}
           <div className="hidden md:grid grid-cols-[1.8fr_2fr_1.4fr_0.8fr_0.8fr_0.8fr] gap-4 px-4 py-2.5 border-b border-[#f2f2f7]">

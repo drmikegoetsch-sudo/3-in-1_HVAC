@@ -1,14 +1,16 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
+import { LayoutDashboard, ClipboardList, Wrench, CalendarDays, Receipt, Plus } from 'lucide-react'
 
 const nav = [
-  { href: '/',           label: 'Dashboard',   icon: '⊟' },
-  { href: '/follow-ups', label: 'Follow-Ups',  icon: '≡' },
-  { href: '/parts',      label: 'Parts',       icon: '⚙' },
-  { href: '/schedule',   label: 'Schedule',    icon: '◻' },
-  { href: '/billing',    label: 'Billing',     icon: '$' },
+  { href: '/',           label: 'Dashboard',   Icon: LayoutDashboard },
+  { href: '/follow-ups', label: 'Follow-Ups',  Icon: ClipboardList },
+  { href: '/parts',      label: 'Parts',       Icon: Wrench },
+  { href: '/schedule',   label: 'Schedule',    Icon: CalendarDays },
+  { href: '/billing',    label: 'Billing',     Icon: Receipt },
 ]
 
 export default function Sidebar() {
@@ -17,19 +19,18 @@ export default function Sidebar() {
   return (
     <aside className="hidden md:flex w-52 shrink-0 flex-col bg-[#111111] select-none">
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-4 pt-6 pb-5">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+      <div className="flex items-center gap-3 px-4 pt-6 pb-5">
+        <Image
           src="/l.svg"
           alt="3N1 HVAC"
-          width={26}
-          height={26}
+          width={32}
+          height={32}
           className="shrink-0 invert opacity-90"
-          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+          priority
         />
         <div>
-          <div className="text-[13px] font-semibold text-white leading-tight tracking-[-0.01em]">3N1 HVAC</div>
-          <div className="text-[11px] text-white/40 leading-tight mt-0.5">Follow-Up Manager</div>
+          <div className="text-[13px] font-bold text-white leading-tight tracking-wide">3N1 HVAC</div>
+          <div className="text-[10px] text-white/40 leading-tight mt-0.5 tracking-wide">Follow-Up Manager</div>
         </div>
       </div>
 
@@ -37,7 +38,7 @@ export default function Sidebar() {
 
       {/* Nav */}
       <nav className="flex-1 px-2 py-2 space-y-px">
-        {nav.map(({ href, label, icon }) => {
+        {nav.map(({ href, label, Icon }) => {
           const active = href === '/' ? pathname === '/' : pathname.startsWith(href)
           return (
             <Link
@@ -49,7 +50,7 @@ export default function Sidebar() {
                   : 'text-white/50 hover:bg-white/[0.06] hover:text-white/75'
               }`}
             >
-              <span className="text-[13px] w-4 text-center shrink-0">{icon}</span>
+              <Icon size={15} strokeWidth={active ? 2.2 : 1.8} className="shrink-0" />
               {label}
             </Link>
           )
@@ -63,7 +64,7 @@ export default function Sidebar() {
           href="/follow-ups/new"
           className="flex items-center gap-2.5 px-3 py-[7px] rounded-[8px] text-[13px] text-white/50 hover:bg-white/[0.06] hover:text-white/75 transition-all duration-100"
         >
-          <span className="text-[15px] w-4 text-center shrink-0 leading-none">+</span>
+          <Plus size={15} strokeWidth={1.8} className="shrink-0" />
           New Follow-Up
         </Link>
       </div>

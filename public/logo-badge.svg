@@ -1,0 +1,5 @@
+<svg width="120" height="48" viewBox="0 0 120 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M8 6 L22 0 L98 0 L112 6 L120 24 L112 42 L98 48 L22 48 L8 42 L0 24 Z" fill="currentColor"/>
+  <text x="60" y="21" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-weight="900" font-size="16" fill="white" letter-spacing="1.5">3N1</text>
+  <text x="60" y="37" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-weight="800" font-size="13" fill="white" letter-spacing="3">HVAC</text>
+</svg>

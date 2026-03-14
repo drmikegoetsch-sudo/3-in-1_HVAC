@@ -1,5 +1,9 @@
 import { supabase } from '@/lib/supabase'
+import { getGreeting } from '@/lib/constants'
 import Link from 'next/link'
+import EmptyState from '@/components/EmptyState'
+
+export const revalidate = 30
 
 const STATUSES = [
   { key: 'needs_pricing',          label: 'Needs Pricing',        href: '/follow-ups?status=needs_pricing' },
@@ -32,7 +36,7 @@ export default async function DashboardPage() {
       {/* Header */}
       <div className="flex items-start justify-between mb-7">
         <div>
-          <h1 className="text-[22px] font-semibold text-[#1d1d1f] tracking-tight">Good morning</h1>
+          <h1 className="text-[22px] font-semibold text-[#1d1d1f] tracking-tight">{getGreeting()}</h1>
           <p className="text-[14px] text-[#6e6e73] mt-0.5">
             {totalOpen === 0
               ? 'Everything is caught up.'
@@ -49,24 +53,20 @@ export default async function DashboardPage() {
       </div>
 
       {activeStatuses.length === 0 ? (
-        <div className="text-center py-16">
-          <div className="text-[28px] mb-2 text-[#c7c7cc]">✓</div>
-          <div className="text-[13px] text-[#8e8e93]">Nothing open</div>
-        </div>
+        <EmptyState message="Nothing open" />
       ) : (
         <div
           className="max-w-lg bg-white rounded-[12px] overflow-hidden"
-          style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)' }}
+          style={{ boxShadow: 'var(--card-shadow)' }}
         >
           {activeStatuses.map(({ key, label, href }, index) => {
             const c = counts[key] ?? { total: 0, overdue: 0 }
-            const isLast = index === activeStatuses.length - 1
             return (
               <Link
                 key={key}
                 href={href}
                 className={`flex items-center justify-between px-4 py-[11px] hover:bg-[#f9f9fb] active:bg-[#f5f5f7] transition-colors ${
-                  !isLast ? 'border-b border-[#f2f2f7]' : ''
+                  index < activeStatuses.length - 1 ? 'border-b border-[#f2f2f7]' : ''
                 }`}
               >
                 <div className="flex items-center gap-3">
