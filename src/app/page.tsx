@@ -30,17 +30,70 @@ export default async function DashboardPage() {
   const totalOpen = Object.values(counts).reduce((a, b) => a + b.total, 0)
   const activeStatuses = STATUSES.filter(({ key }) => (counts[key]?.total ?? 0) > 0)
 
-  /* ── Empty state: centered greeting ── */
+  /* ── Empty state: beautiful centered greeting ── */
   if (activeStatuses.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center px-4 min-h-[60vh]">
-        <h1 className="text-[24px] font-semibold text-[#1d1d1f] tracking-tight">{getGreeting()}</h1>
-        <p className="text-[14px] text-[#8e8e93] mt-1">Everything is caught up.</p>
+      <div className="flex flex-col items-center justify-center px-6 min-h-[65vh] relative">
+        {/* Soft radial glow behind everything */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'radial-gradient(ellipse 50% 40% at 50% 45%, rgba(242,106,27,0.06) 0%, transparent 100%)',
+          }}
+        />
+
+        {/* Animated check ring */}
+        <div className="relative mb-6 empty-animate">
+          <svg width="72" height="72" viewBox="0 0 72 72" fill="none" className="block">
+            {/* Outer dashed ring with gradient — slow spin */}
+            <circle
+              cx="36" cy="36" r="34"
+              stroke="url(#ring-grad)"
+              strokeWidth="1.5"
+              strokeDasharray="4 6"
+              className="empty-ring"
+            />
+            {/* Inner circle */}
+            <circle cx="36" cy="36" r="26" fill="white" />
+            <circle cx="36" cy="36" r="26" fill="url(#inner-grad)" opacity="0.45" />
+            {/* Checkmark draws in */}
+            <path
+              d="M26 36.5 L33 43 L46 29"
+              stroke="#f26a1b"
+              strokeWidth="2.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              fill="none"
+              className="empty-check"
+            />
+            <defs>
+              <linearGradient id="ring-grad" x1="0" y1="0" x2="72" y2="72" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#f26a1b" stopOpacity="0.5" />
+                <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.25" />
+                <stop offset="100%" stopColor="#f26a1b" stopOpacity="0.5" />
+              </linearGradient>
+              <radialGradient id="inner-grad" cx="50%" cy="40%" r="60%">
+                <stop offset="0%" stopColor="#f26a1b" stopOpacity="0.08" />
+                <stop offset="100%" stopColor="#f26a1b" stopOpacity="0" />
+              </radialGradient>
+            </defs>
+          </svg>
+        </div>
+
+        {/* Greeting */}
+        <h1 className="text-[28px] md:text-[34px] font-semibold text-[#1d1d1f] tracking-tight empty-animate empty-animate-delay-1">
+          {getGreeting()}
+        </h1>
+        <p className="text-[15px] md:text-[16px] text-[#8e8e93] mt-1.5 empty-animate empty-animate-delay-2">
+          Everything is caught up.
+        </p>
+
+        {/* CTA — pill button with brand glow */}
         <Link
           href="/follow-ups/new"
-          className="mt-6 inline-flex items-center gap-2 h-9 px-4 bg-[#f26a1b] hover:bg-[#d4560d] active:bg-[#c24e0b] text-white text-[13px] font-semibold rounded-[10px] transition-colors tracking-[-0.01em] shadow-[0_1px_2px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.12)]"
+          className="mt-8 inline-flex items-center gap-2 h-10 px-5 bg-[#f26a1b] hover:bg-[#d4560d] active:bg-[#c24e0b] text-white text-[14px] font-semibold rounded-full transition-colors tracking-[-0.01em] shadow-[0_2px_8px_rgba(242,106,27,0.3),inset_0_1px_0_rgba(255,255,255,0.15)] empty-animate empty-animate-delay-3"
         >
-          <span className="text-[19px] font-light leading-none -mt-px">+</span>
+          <span className="text-[18px] font-light leading-none -mt-px">+</span>
           New Follow-Up
         </Link>
       </div>
