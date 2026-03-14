@@ -124,11 +124,19 @@ export default async function FollowUpsPage({
             const rowBase = `hover:bg-[#f9f9fb] active:bg-[#f5f5f7] transition-colors ${!isLast ? 'border-b border-[#f5f5f7]' : ''} ${overdue ? 'bg-red-50/40 hover:bg-red-50/60' : ''}`
 
             return (
-              <Link key={item.id} href={`/follow-ups/${item.id}`} className={`block ${rowBase}`}>
+              <div key={item.id} className={`relative ${rowBase}`}>
+                {/* Row background link → follow-up detail */}
+                <Link href={`/follow-ups/${item.id}`} className="absolute inset-0 z-0" aria-label={item.title ?? ''} />
                 {/* Desktop row */}
-                <div className="hidden md:grid grid-cols-[1.8fr_2fr_1.4fr_0.8fr_0.8fr_0.8fr] gap-4 px-4 py-3">
+                <div className="relative z-10 hidden md:grid grid-cols-[1.8fr_2fr_1.4fr_0.8fr_0.8fr_0.8fr] gap-4 px-4 py-3">
                   <div>
-                    <div className="text-[13px] font-medium text-[#1d1d1f] truncate">{item.customer_name}</div>
+                    {item.customer_id ? (
+                      <Link href={`/customers/${item.customer_id}`} className="text-[13px] font-medium text-[#1d1d1f] hover:text-[#f26a1b] hover:underline truncate block transition-colors">
+                        {item.customer_name}
+                      </Link>
+                    ) : (
+                      <div className="text-[13px] font-medium text-[#1d1d1f] truncate">{item.customer_name}</div>
+                    )}
                     {item.customer_phone && (
                       <div className="text-[11px] text-[#8e8e93] mt-0.5">{item.customer_phone}</div>
                     )}
@@ -165,10 +173,16 @@ export default async function FollowUpsPage({
                 </div>
 
                 {/* Mobile card row */}
-                <div className="md:hidden px-4 py-3.5">
+                <div className="relative z-10 md:hidden px-4 py-3.5">
                   <div className="flex items-start justify-between gap-2 mb-1.5">
                     <div className="min-w-0">
-                      <div className="text-[14px] font-medium text-[#1d1d1f] truncate">{item.customer_name}</div>
+                      {item.customer_id ? (
+                        <Link href={`/customers/${item.customer_id}`} className="text-[14px] font-medium text-[#1d1d1f] hover:text-[#f26a1b] truncate block transition-colors">
+                          {item.customer_name}
+                        </Link>
+                      ) : (
+                        <div className="text-[14px] font-medium text-[#1d1d1f] truncate">{item.customer_name}</div>
+                      )}
                       <div className="text-[13px] text-[#6e6e73] mt-0.5 truncate">{item.title}</div>
                     </div>
                     <span className="text-[#c7c7cc] text-[14px] leading-none mt-0.5 shrink-0">›</span>
@@ -190,7 +204,7 @@ export default async function FollowUpsPage({
                     )}
                   </div>
                 </div>
-              </Link>
+              </div>
             )
           })}
         </div>

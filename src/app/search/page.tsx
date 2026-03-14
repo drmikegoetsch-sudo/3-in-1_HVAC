@@ -9,6 +9,7 @@ import { STATUS_LABELS, STATUS_BADGE, shortDate, isOverdue } from '@/lib/constan
 
 type Result = {
   id: string | null
+  customer_id: string | null
   customer_name: string | null
   title: string | null
   status: string | null
@@ -65,7 +66,7 @@ function SearchInner() {
     setLoading(true)
     const { data } = await supabase
       .from('follow_up_detail')
-      .select('id, customer_name, title, status, category, due_date, priority, archived_at')
+      .select('id, customer_id, customer_name, title, status, category, due_date, priority, archived_at')
       .is('archived_at', null)
       .or(
         `customer_name.ilike.%${q}%,title.ilike.%${q}%,description.ilike.%${q}%,part_name.ilike.%${q}%`
@@ -161,17 +162,25 @@ function SearchInner() {
               if (!item.id) return null
               const overdue = isOverdue(item.due_date)
               return (
-                <Link
+                <div
                   key={item.id}
-                  href={`/follow-ups/${item.id}`}
-                  className={`flex items-start justify-between px-4 py-3.5 hover:bg-[#f9f9fb] active:bg-[#f5f5f7] transition-colors ${
+                  className={`relative flex items-start justify-between px-4 py-3.5 hover:bg-[#f9f9fb] active:bg-[#f5f5f7] transition-colors ${
                     index < results.length - 1 ? 'border-b border-[#f5f5f7]' : ''
                   }`}
                 >
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[14px] font-medium text-[#1d1d1f] truncate">
-                      {item.customer_name}
-                    </div>
+                  {/* Row background link → follow-up detail */}
+                  <Link href={`/follow-ups/${item.id}`} className="absolute inset-0 z-0" aria-label={item.title ?? ''} />
+                  <div className="relative z-10 min-w-0 flex-1">
+                    {item.customer_id ? (
+                      <Link
+                        href={`/customers/${item.customer_id}`}
+                        className="text-[14px] font-medium text-[#1d1d1f] hover:text-[#f26a1b] hover:underline truncate block transition-colors"
+                      >
+                        {item.customer_name}
+                      </Link>
+                    ) : (
+                      <div className="text-[14px] font-medium text-[#1d1d1f] truncate">{item.customer_name}</div>
+                    )}
                     <div className="text-[13px] text-[#6e6e73] mt-0.5 truncate">{item.title}</div>
                     {item.category && (
                       <div className="text-[11px] text-[#8e8e93] mt-1">
@@ -179,12 +188,10 @@ function SearchInner() {
                       </div>
                     )}
                   </div>
-                  <div className="shrink-0 ml-4 text-right space-y-1.5">
+                  <div className="relative z-10 shrink-0 ml-4 text-right space-y-1.5">
                     {item.status && (
                       <div>
-                        <span
-                          className={`inline-flex px-2 py-0.5 rounded text-[11px] font-medium ${STATUS_BADGE[item.status] ?? ''}`}
-                        >
+                        <span className={`inline-flex px-2 py-0.5 rounded text-[11px] font-medium ${STATUS_BADGE[item.status] ?? ''}`}>
                           {STATUS_LABELS[item.status]}
                         </span>
                       </div>
@@ -195,7 +202,7 @@ function SearchInner() {
                       </div>
                     )}
                   </div>
-                </Link>
+                </div>
               )
             })}
           </div>

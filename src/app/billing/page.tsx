@@ -45,21 +45,27 @@ export default async function BillingPage({
           {items.map((item, index) => {
             const overdue = !isClosedView && isOverdue(item.due_date)
             return (
-              <Link
+              <div
                 key={item.id}
-                href={`/follow-ups/${item.id}`}
-                className={`flex items-center justify-between px-4 py-3.5 hover:bg-[#f9f9fb] transition-colors ${
+                className={`relative flex items-center justify-between px-4 py-3.5 hover:bg-[#f9f9fb] transition-colors ${
                   index < items.length - 1 ? 'border-b border-[#f5f5f7]' : ''
                 } ${overdue ? 'bg-red-50/30' : ''}`}
               >
-                <div className="min-w-0">
-                  <div className="text-[14px] font-medium text-[#1d1d1f]">{item.customer_name}</div>
+                <Link href={`/follow-ups/${item.id}`} className="absolute inset-0 z-0" aria-label={item.title ?? ''} />
+                <div className="relative z-10 min-w-0">
+                  {item.customer_id ? (
+                    <Link href={`/customers/${item.customer_id}`} className="text-[14px] font-medium text-[#1d1d1f] hover:text-[#f26a1b] hover:underline block transition-colors">
+                      {item.customer_name}
+                    </Link>
+                  ) : (
+                    <div className="text-[14px] font-medium text-[#1d1d1f]">{item.customer_name}</div>
+                  )}
                   <div className="text-[13px] text-[#6e6e73] mt-0.5">{item.title}</div>
                   {item.customer_phone && (
                     <div className="text-[12px] text-[#f26a1b] font-medium mt-1">{item.customer_phone}</div>
                   )}
                 </div>
-                <div className="text-right shrink-0 ml-4">
+                <div className="relative z-10 text-right shrink-0 ml-4">
                   {item.due_date && (
                     <div className={`text-[12px] font-medium ${overdue ? 'text-red-500' : 'text-[#6e6e73]'}`}>
                       {overdue ? '⚠ Overdue · ' : ''}
@@ -67,7 +73,7 @@ export default async function BillingPage({
                     </div>
                   )}
                 </div>
-              </Link>
+              </div>
             )
           })}
         </div>
