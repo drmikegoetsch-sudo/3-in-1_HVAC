@@ -48,3 +48,12 @@ body {
   stroke-dashoffset: 24;
   animation: empty-check-draw 0.6s ease-out 0.3s forwards;
 }
+
+/* ── Form progressive-disclosure animation ── */
+@keyframes form-section-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.form-section-enter {
+  animation: form-section-enter 0.25s ease-out both;
+}
