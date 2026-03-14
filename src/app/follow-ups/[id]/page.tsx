@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import { STATUS_LABELS, STATUS_BADGE } from '@/lib/constants'
 import { notFound } from 'next/navigation'
+import Link from 'next/link'
 import StatusUpdater from './StatusUpdater'
 import CommunicationLogger from './CommunicationLogger'
 import ArchiveButton from './ArchiveButton'
@@ -88,7 +89,15 @@ export default async function FollowUpDetailPage({ params }: { params: Promise<{
               <SectionLabel>Customer</SectionLabel>
             </div>
             <div className="px-4 pb-4 space-y-px">
-              <div className="text-[14px] font-medium text-[#1d1d1f]">{customer?.name}</div>
+              <div className="flex items-baseline justify-between gap-3">
+                <div className="text-[14px] font-medium text-[#1d1d1f]">{customer?.name}</div>
+                <Link
+                  href={`/customers/${item.customer_id}`}
+                  className="text-[11px] text-[#f26a1b] hover:text-[#d4560d] shrink-0 transition-colors"
+                >
+                  View history →
+                </Link>
+              </div>
               {customer?.phone && (
                 <div className="text-[13px] text-[#f26a1b] font-medium">{customer.phone}</div>
               )}

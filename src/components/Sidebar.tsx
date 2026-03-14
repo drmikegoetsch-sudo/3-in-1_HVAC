@@ -2,8 +2,9 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { usePathname } from 'next/navigation'
-import { LayoutDashboard, ClipboardList, Wrench, CalendarDays, Receipt, Plus } from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation'
+import { LayoutDashboard, ClipboardList, Wrench, CalendarDays, Receipt, Plus, Search } from 'lucide-react'
+import { useState } from 'react'
 
 const nav = [
   { href: '/',           label: 'Dashboard',   Icon: LayoutDashboard },
@@ -15,6 +16,15 @@ const nav = [
 
 export default function Sidebar() {
   const pathname = usePathname()
+  const router = useRouter()
+  const [searchQuery, setSearchQuery] = useState('')
+
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault()
+    const q = searchQuery.trim()
+    if (q.length >= 2) router.push(`/search?q=${encodeURIComponent(q)}`)
+    else router.push('/search')
+  }
 
   return (
     <aside className="hidden md:flex w-52 shrink-0 flex-col bg-[#111111] select-none">
@@ -34,7 +44,21 @@ export default function Sidebar() {
         </div>
       </div>
 
-      <div className="mx-3 h-px bg-white/[0.07] mb-1" />
+      <div className="mx-3 h-px bg-white/[0.07] mb-3" />
+
+      {/* Search */}
+      <form onSubmit={handleSearch} className="px-2 mb-2">
+        <div className="relative">
+          <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none" />
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            placeholder="Search…"
+            className="w-full pl-7 pr-2.5 py-1.5 text-[12px] bg-white/[0.07] hover:bg-white/[0.1] text-white/70 placeholder:text-white/25 rounded-[7px] border border-transparent focus:outline-none focus:bg-white/[0.1] focus:border-white/[0.12] transition-all"
+          />
+        </div>
+      </form>
 
       {/* Nav */}
       <nav className="flex-1 px-2 py-2 space-y-px">
