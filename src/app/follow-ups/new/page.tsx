@@ -638,7 +638,7 @@ export default function NewFollowUpPage() {
             SUBMIT AREA
            ═══════════════════════════════════════════ */}
         {activeConfig && (
-          <div className="space-y-3 pt-1">
+          <div className="space-y-3 pt-1 pb-6">
             {/* Status summary */}
             <p className="text-[12px] text-[#8e8e93] px-1">
               Will be created as{' '}
