@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import Sidebar from '@/components/Sidebar'
 import MobileNav from '@/components/MobileNav'
+import MobileHeader from '@/components/MobileHeader'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -17,6 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${inter.className} antialiased flex h-screen overflow-hidden bg-[#f5f5f7]`}>
         <Sidebar />
         <main className="flex-1 overflow-y-auto pb-20 md:pb-0">
+          <MobileHeader />
           {children}
         </main>
         <MobileNav />

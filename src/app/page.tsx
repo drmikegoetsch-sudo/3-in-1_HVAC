@@ -1,7 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import { getGreeting } from '@/lib/constants'
 import Link from 'next/link'
-import EmptyState from '@/components/EmptyState'
 
 export const revalidate = 30
 
@@ -31,18 +30,30 @@ export default async function DashboardPage() {
   const totalOpen = Object.values(counts).reduce((a, b) => a + b.total, 0)
   const activeStatuses = STATUSES.filter(({ key }) => (counts[key]?.total ?? 0) > 0)
 
+  /* ── Empty state: centered greeting ── */
+  if (activeStatuses.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center px-4 min-h-[60vh]">
+        <h1 className="text-[24px] font-semibold text-[#1d1d1f] tracking-tight">{getGreeting()}</h1>
+        <p className="text-[14px] text-[#8e8e93] mt-1">Everything is caught up.</p>
+        <Link
+          href="/follow-ups/new"
+          className="mt-6 inline-flex items-center gap-2 h-9 px-4 bg-[#f26a1b] hover:bg-[#d4560d] active:bg-[#c24e0b] text-white text-[13px] font-semibold rounded-[10px] transition-colors tracking-[-0.01em] shadow-[0_1px_2px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.12)]"
+        >
+          <span className="text-[19px] font-light leading-none -mt-px">+</span>
+          New Follow-Up
+        </Link>
+      </div>
+    )
+  }
+
+  /* ── Active items: straight to business ── */
   return (
     <div className="p-4 md:p-8">
-      {/* Header */}
-      <div className="flex items-start justify-between mb-7">
-        <div>
-          <h1 className="text-[22px] font-semibold text-[#1d1d1f] tracking-tight">{getGreeting()}</h1>
-          <p className="text-[14px] text-[#6e6e73] mt-0.5">
-            {totalOpen === 0
-              ? 'Everything is caught up.'
-              : `${totalOpen} item${totalOpen !== 1 ? 's' : ''} need attention`}
-          </p>
-        </div>
+      <div className="flex items-start justify-between mb-5">
+        <p className="text-[14px] text-[#6e6e73]">
+          {totalOpen} item{totalOpen !== 1 ? 's' : ''} need attention
+        </p>
         <Link
           href="/follow-ups/new"
           className="inline-flex items-center gap-2 h-9 px-4 bg-[#f26a1b] hover:bg-[#d4560d] active:bg-[#c24e0b] text-white text-[13px] font-semibold rounded-[10px] transition-colors shrink-0 tracking-[-0.01em] shadow-[0_1px_2px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.12)]"
@@ -52,45 +63,41 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      {activeStatuses.length === 0 ? (
-        <EmptyState message="Nothing open" />
-      ) : (
-        <div
-          className="max-w-lg bg-white rounded-[12px] overflow-hidden"
-          style={{ boxShadow: 'var(--card-shadow)' }}
-        >
-          {activeStatuses.map(({ key, label, href }, index) => {
-            const c = counts[key] ?? { total: 0, overdue: 0 }
-            return (
-              <Link
-                key={key}
-                href={href}
-                className={`flex items-center justify-between px-4 py-[11px] hover:bg-[#f9f9fb] active:bg-[#f5f5f7] transition-colors ${
-                  index < activeStatuses.length - 1 ? 'border-b border-[#f2f2f7]' : ''
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`w-[7px] h-[7px] rounded-full shrink-0 ${
-                      c.overdue > 0 ? 'bg-red-400' : 'bg-[#d1d1d6]'
-                    }`}
-                  />
-                  <span className="text-[14px] text-[#1d1d1f]">{label}</span>
-                  {c.overdue > 0 && (
-                    <span className="text-[11px] text-red-500 font-medium tabular-nums">
-                      {c.overdue} overdue
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[14px] font-semibold text-[#1d1d1f] tabular-nums">{c.total}</span>
-                  <span className="text-[#c7c7cc] text-[13px] leading-none">›</span>
-                </div>
-              </Link>
-            )
-          })}
-        </div>
-      )}
+      <div
+        className="max-w-lg bg-white rounded-[12px] overflow-hidden"
+        style={{ boxShadow: 'var(--card-shadow)' }}
+      >
+        {activeStatuses.map(({ key, label, href }, index) => {
+          const c = counts[key] ?? { total: 0, overdue: 0 }
+          return (
+            <Link
+              key={key}
+              href={href}
+              className={`flex items-center justify-between px-4 py-[11px] hover:bg-[#f9f9fb] active:bg-[#f5f5f7] transition-colors ${
+                index < activeStatuses.length - 1 ? 'border-b border-[#f2f2f7]' : ''
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <span
+                  className={`w-[7px] h-[7px] rounded-full shrink-0 ${
+                    c.overdue > 0 ? 'bg-red-400' : 'bg-[#d1d1d6]'
+                  }`}
+                />
+                <span className="text-[14px] text-[#1d1d1f]">{label}</span>
+                {c.overdue > 0 && (
+                  <span className="text-[11px] text-red-500 font-medium tabular-nums">
+                    {c.overdue} overdue
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[14px] font-semibold text-[#1d1d1f] tabular-nums">{c.total}</span>
+                <span className="text-[#c7c7cc] text-[13px] leading-none">›</span>
+              </div>
+            </Link>
+          )
+        })}
+      </div>
     </div>
   )
 }
