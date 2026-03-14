@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Search, X } from 'lucide-react'
@@ -30,6 +30,14 @@ const CATEGORY_LABELS: Record<string, string> = {
 }
 
 export default function SearchPage() {
+  return (
+    <Suspense fallback={<div className="p-4 md:p-8 max-w-2xl"><div className="h-11 bg-[#f0f0f5] rounded-[12px] animate-pulse" /></div>}>
+      <SearchInner />
+    </Suspense>
+  )
+}
+
+function SearchInner() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const inputRef = useRef<HTMLInputElement>(null)
