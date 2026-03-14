@@ -4,6 +4,8 @@ type Item = {
   id: string | null
   customer_name: string | null
   title: string | null
+  due_date: string | null
+  priority: string | null
   [key: string]: unknown
 }
 
