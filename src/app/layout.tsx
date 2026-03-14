@@ -10,6 +10,17 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: '3N1 HVAC | Follow-Up Manager',
   description: 'Open loop tracking for 3N1 HVAC service follow-ups',
+  openGraph: {
+    title: '3N1 HVAC | Follow-Up Manager',
+    description: 'Open loop tracking for 3N1 HVAC service follow-ups',
+    siteName: '3N1 HVAC',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: '3N1 HVAC | Follow-Up Manager',
+    description: 'Open loop tracking for 3N1 HVAC service follow-ups',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
