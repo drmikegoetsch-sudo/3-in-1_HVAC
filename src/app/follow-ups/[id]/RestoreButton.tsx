@@ -1,0 +1,51 @@
+'use client'
+
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { supabase } from '@/lib/supabase'
+
+export default function RestoreButton({
+  itemId,
+  currentStatus,
+}: {
+  itemId: string
+  currentStatus: string
+}) {
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
+  const [done, setDone] = useState(false)
+
+  async function restore() {
+    setLoading(true)
+    const { error } = await supabase
+      .from('follow_up_items')
+      .update({ status: 'needs_pricing', closed_at: null })
+      .eq('id', itemId)
+
+    if (!error) {
+      await supabase.from('activity_log').insert({
+        follow_up_item_id: itemId,
+        action_type: 'status_change',
+        old_value: currentStatus,
+        new_value: 'needs_pricing',
+      })
+      setDone(true)
+      router.refresh()
+    }
+    setLoading(false)
+  }
+
+  return (
+    <div className="space-y-2">
+      <p className="text-[13px] text-[#8e8e93]">This follow-up is closed.</p>
+      <button
+        onClick={restore}
+        disabled={loading || done}
+        className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-[10px] text-[13px] font-medium transition-colors disabled:opacity-40 tracking-[-0.01em] bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#ebebed] active:bg-[#e0e0e5]"
+      >
+        <span>{done ? 'Restored!' : loading ? 'Restoring…' : 'Restore Follow-Up'}</span>
+        <span className="text-[15px] leading-none text-[#6e6e73]">↩</span>
+      </button>
+    </div>
+  )
+}

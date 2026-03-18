@@ -3,6 +3,7 @@ import { STATUS_LABELS, STATUS_BADGE } from '@/lib/constants'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import StatusUpdater from './StatusUpdater'
+import RestoreButton from './RestoreButton'
 import CommunicationLogger from './CommunicationLogger'
 import ArchiveButton from './ArchiveButton'
 
@@ -206,7 +207,10 @@ export default async function FollowUpDetailPage({ params }: { params: Promise<{
                   statusLabels={STATUS_LABELS}
                 />
               ) : (
-                <p className="text-[13px] text-[#8e8e93]">This item is closed.</p>
+                <RestoreButton
+                  itemId={id}
+                  currentStatus={item.status ?? 'closed'}
+                />
               )}
             </div>
           </Card>
