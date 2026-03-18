@@ -3,6 +3,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import type { Database } from '@/lib/database.types'
+
+type FollowUpStatus = Database['public']['Enums']['follow_up_status']
 
 export default function RestoreButton({
   itemId,
@@ -17,9 +20,23 @@ export default function RestoreButton({
 
   async function restore() {
     setLoading(true)
+
+    // Look up the status the item was in just before it was closed
+    const { data: logEntry } = await supabase
+      .from('activity_log')
+      .select('old_value')
+      .eq('follow_up_item_id', itemId)
+      .eq('action_type', 'status_change')
+      .eq('new_value', 'closed')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single()
+
+    const restoreStatus = (logEntry?.old_value ?? 'needs_pricing') as FollowUpStatus
+
     const { error } = await supabase
       .from('follow_up_items')
-      .update({ status: 'needs_pricing', closed_at: null })
+      .update({ status: restoreStatus, closed_at: null })
       .eq('id', itemId)
 
     if (!error) {
@@ -27,7 +44,7 @@ export default function RestoreButton({
         follow_up_item_id: itemId,
         action_type: 'status_change',
         old_value: currentStatus,
-        new_value: 'needs_pricing',
+        new_value: restoreStatus,
       })
       setDone(true)
       router.refresh()
