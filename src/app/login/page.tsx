@@ -45,10 +45,7 @@ export default function LoginPage() {
             width={180}
             height={72}
             priority
-            onError={(e) => {
-              // Fall back to badge if dark logo not present
-              (e.target as HTMLImageElement).src = '/logo-badge.svg'
-            }}
+            unoptimized
           />
         </div>
 

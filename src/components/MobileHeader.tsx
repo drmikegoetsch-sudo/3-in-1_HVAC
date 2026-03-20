@@ -30,6 +30,7 @@ export default function MobileHeader() {
           height={28}
           className="shrink-0"
           priority
+          unoptimized
         />
         <div>
           <div className="text-[13px] font-bold text-[#1d1d1f] leading-tight tracking-wide">3N1 HVAC</div>

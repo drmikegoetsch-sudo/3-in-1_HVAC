@@ -45,6 +45,7 @@ export default function Sidebar() {
           height={32}
           className="shrink-0 brightness-0 invert opacity-90"
           priority
+          unoptimized
         />
         <div>
           <div className="text-[13px] font-bold text-white leading-tight tracking-wide">3N1 HVAC</div>
