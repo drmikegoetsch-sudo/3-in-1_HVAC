@@ -3,8 +3,9 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
-import { LayoutDashboard, ClipboardList, Wrench, CalendarDays, Receipt, Plus, Search } from 'lucide-react'
+import { LayoutDashboard, ClipboardList, Wrench, CalendarDays, Receipt, Plus, Search, LogOut } from 'lucide-react'
 import { useState } from 'react'
+import { createSupabaseBrowserClient } from '@/lib/supabase-browser'
 
 const nav = [
   { href: '/',           label: 'Dashboard',   Icon: LayoutDashboard },
@@ -18,6 +19,13 @@ export default function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
+
+  async function handleLogout() {
+    const supabase = createSupabaseBrowserClient()
+    await supabase.auth.signOut()
+    router.push('/login')
+    router.refresh()
+  }
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
@@ -81,7 +89,7 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* New Follow-Up */}
+      {/* New Follow-Up + Logout */}
       <div className="px-2 pb-5">
         <div className="h-px bg-white/[0.07] mb-2 mx-1" />
         <Link
@@ -91,6 +99,13 @@ export default function Sidebar() {
           <Plus size={15} strokeWidth={1.8} className="shrink-0" />
           New Follow-Up
         </Link>
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-2.5 px-3 py-[7px] rounded-[8px] text-[13px] text-white/30 hover:bg-white/[0.06] hover:text-white/50 transition-all duration-100 mt-px"
+        >
+          <LogOut size={15} strokeWidth={1.8} className="shrink-0" />
+          Sign Out
+        </button>
       </div>
     </aside>
   )
