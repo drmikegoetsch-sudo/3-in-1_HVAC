@@ -8,6 +8,7 @@ import MobileHeader from '@/components/MobileHeader'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'https://3n1-hvac.vercel.app'),
   title: '3N1 HVAC | Follow-Up Manager',
   description: 'Open loop tracking for 3N1 HVAC service follow-ups',
   openGraph: {

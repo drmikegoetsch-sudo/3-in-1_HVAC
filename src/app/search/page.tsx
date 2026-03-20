@@ -53,15 +53,6 @@ function SearchInner() {
     inputRef.current?.focus()
   }, [])
 
-  // Sync URL param → input on navigation
-  useEffect(() => {
-    const q = searchParams.get('q') ?? ''
-    setQuery(q)
-    if (q.trim().length >= 2) runSearch(q)
-    else setResults([])
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams])
-
   async function runSearch(q: string) {
     setLoading(true)
     const { data } = await supabase
@@ -76,6 +67,16 @@ function SearchInner() {
     setResults((data ?? []) as Result[])
     setLoading(false)
   }
+
+  // Sync URL param → input on navigation — setState in effect is intentional here
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    const q = searchParams.get('q') ?? ''
+    setQuery(q)
+    if (q.trim().length >= 2) runSearch(q)
+    else setResults([])
+  }, [searchParams])
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   function handleChange(value: string) {
     setQuery(value)
