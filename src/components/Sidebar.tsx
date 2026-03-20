@@ -43,7 +43,7 @@ export default function Sidebar() {
           alt="3N1 HVAC"
           width={32}
           height={32}
-          className="shrink-0 opacity-90"
+          className="shrink-0 invert opacity-90"
           priority
         />
         <div>
