@@ -39,11 +39,11 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="flex items-center gap-3 px-4 pt-6 pb-5">
         <Image
-          src="/logo-dark.svg"
+          src="/logo-white.svg"
           alt="3N1 HVAC"
           width={32}
           height={32}
-          className="shrink-0 brightness-0 invert opacity-90"
+          className="shrink-0 opacity-90"
           priority
         />
         <div>
