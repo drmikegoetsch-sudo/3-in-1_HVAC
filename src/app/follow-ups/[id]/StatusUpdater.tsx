@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { createSupabaseBrowserClient } from '@/lib/supabase-browser'
 
 export default function StatusUpdater({
   itemId,
@@ -29,11 +30,14 @@ export default function StatusUpdater({
       .eq('id', itemId)
 
     if (!error) {
+      const browser = createSupabaseBrowserClient()
+      const { data: { user } } = await browser.auth.getUser()
       await supabase.from('activity_log').insert({
         follow_up_item_id: itemId,
         action_type: 'status_change',
         old_value: currentStatus,
         new_value: newStatus,
+        created_by: user?.id ?? null,
       })
       router.refresh()
     }

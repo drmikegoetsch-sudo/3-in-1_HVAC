@@ -47,8 +47,29 @@ export default async function FollowUpDetailPage({ params }: { params: Promise<{
     supabase.from('follow_up_items').select('*, customers(*), technicians(*)').eq('id', id).single(),
     supabase.from('parts_requests').select('*').eq('follow_up_item_id', id).maybeSingle(),
     supabase.from('communications').select('*').eq('follow_up_item_id', id).order('sent_at', { ascending: false }),
-    supabase.from('activity_log').select('*').eq('follow_up_item_id', id).order('created_at', { ascending: false }),
+    supabase.from('activity_log').select('*').eq('follow_up_item_id', id).order('created_at', { ascending: true }),
   ])
+
+  // Fetch display names for all users who touched this item
+  const userIds = new Set<string>()
+  if (item?.created_by) userIds.add(item.created_by)
+  activity?.forEach(a => { if (a.created_by) userIds.add(a.created_by) })
+  const profileMap: Record<string, string> = {}
+  if (userIds.size > 0) {
+    const { data: profiles } = await supabase
+      .from('user_profiles')
+      .select('id, display_name, email')
+      .in('id', [...userIds])
+    profiles?.forEach(p => {
+      profileMap[p.id] = p.display_name ?? p.email.split('@')[0]
+    })
+  }
+  function displayName(uid: string | null | undefined): string | null {
+    if (!uid) return null
+    const n = profileMap[uid]
+    if (!n) return null
+    return n.charAt(0).toUpperCase() + n.slice(1)
+  }
 
   if (!item) notFound()
 
@@ -75,6 +96,12 @@ export default async function FollowUpDetailPage({ params }: { params: Promise<{
               <span className="text-[13px] text-[#8e8e93]">
                 {new Date(item.created_at!).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
               </span>
+              {displayName(item.created_by) && (
+                <>
+                  <span className="text-[13px] text-[#8e8e93]">·</span>
+                  <span className="text-[13px] text-[#8e8e93]">by {displayName(item.created_by)}</span>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -242,28 +269,44 @@ export default async function FollowUpDetailPage({ params }: { params: Promise<{
             </div>
           </Card>
 
-          {/* Activity */}
+          {/* Activity timeline */}
           {activity && activity.length > 0 && (
             <Card>
               <div className="px-4 pt-4 pb-4">
                 <SectionLabel>Activity</SectionLabel>
-                <div className="space-y-3 mt-1">
-                  {activity.slice(0, 8).map(a => (
-                    <div key={a.id} className="text-[12px]">
-                      <div className="font-medium text-[#1d1d1f] capitalize">
-                        {a.action_type.replace(/_/g, ' ')}
-                      </div>
-                      {a.old_value && a.new_value && (
-                        <div className="text-[#8e8e93] mt-0.5">
-                          {a.old_value} → {a.new_value}
+                <div className="space-y-0 mt-1">
+                  {activity.map((a, i) => {
+                    const who = displayName(a.created_by)
+                    const when = new Date(a.created_at!).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                    const isStatus = a.action_type === 'status_change'
+                    const isComm = a.action_type === 'communication'
+                    const isLast = i === activity.length - 1
+                    return (
+                      <div key={a.id} className="flex gap-3">
+                        {/* Timeline line */}
+                        <div className="flex flex-col items-center shrink-0">
+                          <div className="w-1.5 h-1.5 rounded-full bg-[#d1d1d6] mt-[5px] shrink-0" />
+                          {!isLast && <div className="w-px flex-1 bg-[#f0f0f5] mt-1" />}
                         </div>
-                      )}
-                      {a.note && <div className="text-[#6e6e73] mt-0.5">{a.note}</div>}
-                      <div className="text-[#c7c7cc] mt-0.5">
-                        {new Date(a.created_at!).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        <div className={`text-[12px] ${isLast ? 'pb-0' : 'pb-3'}`}>
+                          <div className="flex items-baseline gap-1.5 flex-wrap">
+                            {who && <span className="font-medium text-[#1d1d1f]">{who}</span>}
+                            {isStatus && a.old_value && a.new_value && (
+                              <span className="text-[#6e6e73]">
+                                moved to <span className="font-medium text-[#1d1d1f] capitalize">{STATUS_LABELS[a.new_value] ?? a.new_value}</span>
+                              </span>
+                            )}
+                            {isComm && <span className="text-[#6e6e73]">logged a communication</span>}
+                            {!isStatus && !isComm && (
+                              <span className="text-[#6e6e73] capitalize">{a.action_type.replace(/_/g, ' ')}</span>
+                            )}
+                            <span className="text-[#c7c7cc]">· {when}</span>
+                          </div>
+                          {a.note && <div className="text-[#8e8e93] mt-0.5">{a.note}</div>}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
             </Card>

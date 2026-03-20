@@ -29,6 +29,15 @@ export async function GET(request: NextRequest) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
+      // Upsert the user's profile so their name appears in activity logs
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user?.email) {
+        await supabase.from('user_profiles').upsert({
+          id: user.id,
+          email: user.email,
+          display_name: user.user_metadata?.full_name ?? user.email.split('@')[0],
+        }, { onConflict: 'id' })
+      }
       return NextResponse.redirect(`${origin}/follow-ups`)
     }
   }

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { createSupabaseBrowserClient } from '@/lib/supabase-browser'
 import type { Database } from '@/lib/database.types'
 
 type FollowUpStatus = Database['public']['Enums']['follow_up_status']
@@ -40,11 +41,14 @@ export default function RestoreButton({
       .eq('id', itemId)
 
     if (!error) {
+      const browser = createSupabaseBrowserClient()
+      const { data: { user } } = await browser.auth.getUser()
       await supabase.from('activity_log').insert({
         follow_up_item_id: itemId,
         action_type: 'status_change',
         old_value: currentStatus,
         new_value: restoreStatus,
+        created_by: user?.id ?? null,
       })
       setDone(true)
       router.refresh()

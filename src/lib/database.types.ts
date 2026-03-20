@@ -140,6 +140,7 @@ export type Database = {
           category: Database["public"]["Enums"]["follow_up_category"]
           closed_at: string | null
           created_at: string | null
+          created_by: string | null
           customer_id: string
           description: string | null
           due_date: string | null
@@ -160,6 +161,7 @@ export type Database = {
           category: Database["public"]["Enums"]["follow_up_category"]
           closed_at?: string | null
           created_at?: string | null
+          created_by?: string | null
           customer_id: string
           description?: string | null
           due_date?: string | null
@@ -180,6 +182,7 @@ export type Database = {
           category?: Database["public"]["Enums"]["follow_up_category"]
           closed_at?: string | null
           created_at?: string | null
+          created_by?: string | null
           customer_id?: string
           description?: string | null
           due_date?: string | null
@@ -363,6 +366,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_profiles: {
+        Row: {
+          id: string
+          display_name: string | null
+          email: string
+          created_at: string | null
+        }
+        Insert: {
+          id: string
+          display_name?: string | null
+          email: string
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          display_name?: string | null
+          email?: string
+          created_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       follow_up_detail: {
@@ -371,6 +395,9 @@ export type Database = {
           category: Database["public"]["Enums"]["follow_up_category"] | null
           closed_at: string | null
           created_at: string | null
+          created_by_id: string | null
+          created_by_name: string | null
+          created_by_email: string | null
           customer_id: string | null
           customer_email: string | null
           customer_name: string | null

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { createSupabaseBrowserClient } from '@/lib/supabase-browser'
 import { STATUS_LABELS } from '@/lib/constants'
 import {
   Wrench,
@@ -186,6 +187,9 @@ export default function NewFollowUpPage() {
         technicianId = tech.id
       }
 
+      const browser = createSupabaseBrowserClient()
+      const { data: { user } } = await browser.auth.getUser()
+
       const { data: item, error: itemErr } = await supabase
         .from('follow_up_items')
         .insert({
@@ -200,6 +204,7 @@ export default function NewFollowUpPage() {
           due_date: form.due_date || null,
           requires_part: form.requires_part,
           requires_scheduling: form.requires_scheduling,
+          created_by: user?.id ?? null,
         })
         .select('id')
         .single()
