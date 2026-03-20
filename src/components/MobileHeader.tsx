@@ -24,7 +24,7 @@ export default function MobileHeader() {
     <header className="flex md:hidden items-center justify-between px-4 pt-3 pb-2">
       <div className="flex items-center gap-2.5">
         <Image
-          src="/l.svg"
+          src="/logo-dark.svg"
           alt="3N1 HVAC"
           width={28}
           height={28}
