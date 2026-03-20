@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { Search, LogOut } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -23,14 +22,13 @@ export default function MobileHeader() {
   return (
     <header className="flex md:hidden items-center justify-between px-4 pt-3 pb-2">
       <div className="flex items-center gap-2.5">
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src="/logo-dark.svg"
           alt="3N1 HVAC"
           width={28}
           height={28}
           className="shrink-0"
-          priority
-          unoptimized
         />
         <div>
           <div className="text-[13px] font-bold text-[#1d1d1f] leading-tight tracking-wide">3N1 HVAC</div>

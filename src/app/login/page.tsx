@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
 import { createSupabaseBrowserClient } from '@/lib/supabase-browser'
 
 export default function LoginPage() {
@@ -39,13 +38,11 @@ export default function LoginPage() {
 
         {/* Logo */}
         <div className="flex justify-center mb-8">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/logo-dark.svg"
             alt="3N1 HVAC"
-            width={180}
-            height={72}
-            priority
-            unoptimized
+            className="h-[72px] w-auto"
           />
         </div>
 

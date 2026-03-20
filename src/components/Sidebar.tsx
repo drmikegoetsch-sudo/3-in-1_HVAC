@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
+
 import { usePathname, useRouter } from 'next/navigation'
 import { LayoutDashboard, ClipboardList, Wrench, CalendarDays, Receipt, Plus, Search, LogOut } from 'lucide-react'
 import { useState } from 'react'
@@ -38,14 +38,13 @@ export default function Sidebar() {
     <aside className="hidden md:flex w-52 shrink-0 flex-col bg-[#111111] select-none">
       {/* Logo */}
       <div className="flex items-center gap-3 px-4 pt-6 pb-5">
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src="/logo-dark.svg"
           alt="3N1 HVAC"
           width={32}
           height={32}
           className="shrink-0 brightness-0 invert opacity-90"
-          priority
-          unoptimized
         />
         <div>
           <div className="text-[13px] font-bold text-white leading-tight tracking-wide">3N1 HVAC</div>
