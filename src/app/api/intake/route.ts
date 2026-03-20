@@ -88,7 +88,8 @@ export async function POST(req: NextRequest) {
 
     if (fuError || !followUp) throw fuError ?? new Error('Failed to create follow-up')
 
-    // Send email notification
+    // Send email notification (non-blocking — follow-up is already created)
+    if (process.env.RESEND_API_KEY) {
     const resend = new Resend(process.env.RESEND_API_KEY)
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://3n1-hvac.vercel.app'
 
@@ -145,6 +146,7 @@ export async function POST(req: NextRequest) {
         </div>
       `,
     })
+    } // end if RESEND_API_KEY
 
     return NextResponse.json({ success: true, id: followUp.id }, { headers })
   } catch (err) {
