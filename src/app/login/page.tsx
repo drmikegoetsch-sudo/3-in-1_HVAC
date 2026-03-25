@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useState, useRef, Suspense } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { createSupabaseBrowserClient } from '@/lib/supabase-browser'
 
 function LoginForm() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const urlError = searchParams.get('error')
 
   const [email, setEmail] = useState('')
@@ -18,6 +19,17 @@ function LoginForm() {
       ? 'Sign-in failed. Please try again.'
       : ''
   )
+
+  // PIN state
+  const [pin, setPin] = useState(['', '', '', ''])
+  const [pinError, setPinError] = useState('')
+  const [pinLoading, setPinLoading] = useState(false)
+  const pinRefs = [
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+  ]
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -42,6 +54,48 @@ function LoginForm() {
     setLoading(false)
   }
 
+  function handlePinDigit(index: number, value: string) {
+    const digit = value.replace(/\D/g, '').slice(-1)
+    const next = [...pin]
+    next[index] = digit
+    setPin(next)
+    setPinError('')
+
+    if (digit && index < 3) {
+      pinRefs[index + 1].current?.focus()
+    }
+
+    // Auto-submit when all 4 digits filled
+    if (digit && index === 3) {
+      const full = [...next].join('')
+      if (full.length === 4) submitPin(full)
+    }
+  }
+
+  function handlePinKeyDown(index: number, e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Backspace' && !pin[index] && index > 0) {
+      pinRefs[index - 1].current?.focus()
+    }
+  }
+
+  async function submitPin(code: string) {
+    setPinLoading(true)
+    setPinError('')
+    const res = await fetch('/api/pin-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pin: code }),
+    })
+    if (res.ok) {
+      router.push('/follow-ups')
+    } else {
+      setPinError('Incorrect PIN. Try again.')
+      setPin(['', '', '', ''])
+      setPinLoading(false)
+      pinRefs[0].current?.focus()
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#f5f5f7] flex items-center justify-center px-4">
       <div className="w-full max-w-[400px]">
@@ -49,11 +103,7 @@ function LoginForm() {
         {/* Logo */}
         <div className="flex justify-center mb-8">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/logo-dark.svg"
-            alt="3N1 HVAC"
-            className="h-[72px] w-auto"
-          />
+          <img src="/logo-dark.svg" alt="3N1 HVAC" className="h-[72px] w-auto" />
         </div>
 
         {/* Card */}
@@ -83,8 +133,8 @@ function LoginForm() {
               </p>
             </div>
           ) : (
-            /* ── Login form ── */
             <>
+              {/* ── Magic link form ── */}
               <h1 className="text-[20px] font-semibold text-[#1d1d1f] mb-1">Sign in</h1>
               <p className="text-[14px] text-[#6e6e73] mb-6">
                 Enter your email and we&apos;ll send you a sign-in link — no password needed.
@@ -111,9 +161,7 @@ function LoginForm() {
                   />
                 </div>
 
-                {error && (
-                  <p className="text-[13px] text-red-500">{error}</p>
-                )}
+                {error && <p className="text-[13px] text-red-500">{error}</p>}
 
                 <button
                   type="submit"
@@ -123,6 +171,45 @@ function LoginForm() {
                   {loading ? 'Sending…' : 'Send Sign-In Link'}
                 </button>
               </form>
+
+              {/* ── Divider ── */}
+              <div className="flex items-center gap-3 my-6">
+                <div className="flex-1 h-px bg-[#f0f0f5]" />
+                <span className="text-[12px] text-[#aeaeb2] font-medium">or</span>
+                <div className="flex-1 h-px bg-[#f0f0f5]" />
+              </div>
+
+              {/* ── PIN entry ── */}
+              <div>
+                <p className="text-[12px] font-medium text-[#6e6e73] uppercase tracking-wide mb-3">
+                  Team PIN
+                </p>
+                <div className="flex gap-3 justify-center">
+                  {pin.map((digit, i) => (
+                    <input
+                      key={i}
+                      ref={pinRefs[i]}
+                      type="tel"
+                      inputMode="numeric"
+                      maxLength={1}
+                      value={digit}
+                      onChange={e => handlePinDigit(i, e.target.value)}
+                      onKeyDown={e => handlePinKeyDown(i, e)}
+                      disabled={pinLoading}
+                      className={`w-14 h-14 text-center text-[22px] font-semibold rounded-[10px] border
+                        ${pinError ? 'border-red-400 bg-red-50' : 'border-[#d1d1d6] bg-[#fafafa]'}
+                        text-[#1d1d1f] outline-none focus:border-[#f26a1b] focus:ring-2 focus:ring-[#f26a1b]/20
+                        transition-all disabled:opacity-50 caret-transparent`}
+                    />
+                  ))}
+                </div>
+                {pinError && (
+                  <p className="text-[12px] text-red-500 text-center mt-2">{pinError}</p>
+                )}
+                {pinLoading && (
+                  <p className="text-[12px] text-[#aeaeb2] text-center mt-2">Verifying…</p>
+                )}
+              </div>
             </>
           )}
         </div>
