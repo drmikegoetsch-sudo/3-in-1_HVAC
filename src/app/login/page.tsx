@@ -86,7 +86,11 @@ function LoginForm() {
       body: JSON.stringify({ pin: code }),
     })
     if (res.ok) {
-      window.location.href = '/follow-ups'
+      const { name } = await res.json()
+      // Brief greeting before redirect
+      setPinLoading(false)
+      setPinError(`Welcome, ${name}! Taking you in…`)
+      setTimeout(() => { window.location.href = '/follow-ups' }, 800)
     } else {
       setPinError('Incorrect PIN. Try again.')
       setPin(['', '', '', ''])
@@ -203,7 +207,9 @@ function LoginForm() {
                   ))}
                 </div>
                 {pinError && (
-                  <p className="text-[12px] text-red-500 text-center mt-2">{pinError}</p>
+                  <p className={`text-[12px] text-center mt-2 ${pinError.startsWith('Welcome') ? 'text-green-600 font-medium' : 'text-red-500'}`}>
+                    {pinError}
+                  </p>
                 )}
                 {pinLoading && (
                   <p className="text-[12px] text-[#aeaeb2] text-center mt-2">Verifying…</p>

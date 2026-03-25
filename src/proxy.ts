@@ -5,17 +5,19 @@ import type { NextRequest } from 'next/server'
 
 const PIN_SESSION_MAX_AGE = 60 * 60 * 24 * 1000 // 24 hours in ms
 
-function isValidPinCookie(value: string): boolean {
-  if (!process.env.PIN_SECRET) return false
-  const [signature, timestampStr] = value.split(':')
-  if (!signature || !timestampStr) return false
+function parsePinCookie(value: string): { name: string; email: string } | null {
+  if (!process.env.PIN_SECRET) return null
+  const parts = value.split(':')
+  if (parts.length < 4) return null
+  const [signature, name, email, timestampStr] = parts
   const timestamp = parseInt(timestampStr, 10)
-  if (isNaN(timestamp)) return false
-  if (Date.now() - timestamp > PIN_SESSION_MAX_AGE) return false
+  if (isNaN(timestamp)) return null
+  if (Date.now() - timestamp > PIN_SESSION_MAX_AGE) return null
   const expected = createHmac('sha256', process.env.PIN_SECRET)
-    .update(`pin:${timestamp}`)
+    .update(`pin:${name}:${email}:${timestamp}`)
     .digest('hex')
-  return signature === expected
+  if (signature !== expected) return null
+  return { name, email }
 }
 
 export async function proxy(request: NextRequest) {
@@ -45,9 +47,9 @@ export async function proxy(request: NextRequest) {
 
   // Check for valid PIN session cookie
   const pinCookie = request.cookies.get('pin_session')
-  const hasPinSession = pinCookie ? isValidPinCookie(pinCookie.value) : false
+  const pinUser = pinCookie ? parsePinCookie(pinCookie.value) : null
 
-  const isAuthenticated = !!user || hasPinSession
+  const isAuthenticated = !!user || !!pinUser
 
   const isPublic =
     request.nextUrl.pathname.startsWith('/login') ||
