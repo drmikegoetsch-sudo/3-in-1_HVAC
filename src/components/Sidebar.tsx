@@ -23,8 +23,8 @@ export default function Sidebar() {
   async function handleLogout() {
     const supabase = createSupabaseBrowserClient()
     await supabase.auth.signOut()
-    router.push('/login')
-    router.refresh()
+    await fetch('/api/logout', { method: 'POST' })
+    window.location.href = '/login'
   }
 
   function handleSearch(e: React.FormEvent) {

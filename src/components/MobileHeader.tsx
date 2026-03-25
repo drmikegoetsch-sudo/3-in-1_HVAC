@@ -15,8 +15,8 @@ export default function MobileHeader() {
   async function handleLogout() {
     const supabase = createSupabaseBrowserClient()
     await supabase.auth.signOut()
-    router.push('/login')
-    router.refresh()
+    await fetch('/api/logout', { method: 'POST' })
+    window.location.href = '/login'
   }
 
   return (
