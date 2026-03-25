@@ -1,12 +1,11 @@
 'use client'
 
 import { useState, useRef, Suspense } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { createSupabaseBrowserClient } from '@/lib/supabase-browser'
 
 function LoginForm() {
   const searchParams = useSearchParams()
-  const router = useRouter()
   const urlError = searchParams.get('error')
 
   const [email, setEmail] = useState('')
@@ -87,7 +86,7 @@ function LoginForm() {
       body: JSON.stringify({ pin: code }),
     })
     if (res.ok) {
-      router.push('/follow-ups')
+      window.location.href = '/follow-ups'
     } else {
       setPinError('Incorrect PIN. Try again.')
       setPin(['', '', '', ''])
