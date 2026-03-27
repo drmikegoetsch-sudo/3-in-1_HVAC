@@ -252,6 +252,20 @@ export default async function FollowUpDetailPage({ params }: { params: Promise<{
                   {item.category?.replace(/_/g, ' ')}
                 </div>
               </div>
+              {(item.job_type || item.crew_size) && (
+                <div className="flex gap-2">
+                  {item.job_type && (
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-[8px] text-[12px] font-semibold bg-[#fff7f2] text-[#f26a1b] border border-[#f26a1b]/20 capitalize">
+                      {item.job_type}
+                    </span>
+                  )}
+                  {item.crew_size && (
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-[8px] text-[12px] font-semibold bg-[#f5f5f7] text-[#3d3d3f] border border-[#e5e5e7]">
+                      {item.crew_size === 1 ? '1 Person' : '2 People'}
+                    </span>
+                  )}
+                </div>
+              )}
               {item.due_date && (
                 <div>
                   <div className="text-[11px] text-[#8e8e93] mb-0.5">Due Date</div>

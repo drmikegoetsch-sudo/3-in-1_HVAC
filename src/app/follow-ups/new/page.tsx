@@ -137,9 +137,11 @@ export default function NewFollowUpPage() {
     model_number: '',
     serial_number: '',
     vendor: '',
+    job_type: '' as '' | 'service' | 'install' | 'either',
+    crew_size: 0 as 0 | 1 | 2,
   })
 
-  const set = (k: string, v: string | boolean) => setForm(f => ({ ...f, [k]: v }))
+  const set = (k: string, v: string | boolean | number) => setForm(f => ({ ...f, [k]: v }))
 
   const activeConfig = form.category ? CATEGORIES[form.category] : null
   const visibleFields = activeConfig?.fields ?? []
@@ -205,6 +207,8 @@ export default function NewFollowUpPage() {
           requires_part: form.requires_part,
           requires_scheduling: form.requires_scheduling,
           created_by: user?.id ?? null,
+          job_type: form.job_type || null,
+          crew_size: form.crew_size || null,
         })
         .select('id')
         .single()
@@ -347,6 +351,51 @@ export default function NewFollowUpPage() {
                   onChange={e => set('title', e.target.value)}
                   placeholder={activeConfig.placeholder}
                 />
+              </div>
+
+              {/* ── Job Type + Crew Size ── */}
+              <div className="grid grid-cols-2 gap-4 pt-1">
+                {/* Job Type */}
+                <div>
+                  <label className={labelClass}>Job Type</label>
+                  <div className="flex gap-2">
+                    {(['service', 'install', 'either'] as const).map(t => (
+                      <button
+                        key={t}
+                        type="button"
+                        onClick={() => set('job_type', form.job_type === t ? '' : t)}
+                        className={`flex-1 py-2 rounded-[9px] text-[12px] font-semibold capitalize transition-all border ${
+                          form.job_type === t
+                            ? 'bg-[#fff7f2] border-[#f26a1b] text-[#f26a1b] shadow-[0_0_0_2px_rgba(242,106,27,0.15)]'
+                            : 'bg-white border-[#e5e5e7] text-[#6e6e73] hover:border-[#d1d1d6]'
+                        }`}
+                      >
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Crew Size */}
+                <div>
+                  <label className={labelClass}>Crew Size</label>
+                  <div className="flex gap-2">
+                    {([1, 2] as const).map(n => (
+                      <button
+                        key={n}
+                        type="button"
+                        onClick={() => set('crew_size', form.crew_size === n ? 0 : n)}
+                        className={`flex-1 py-2 rounded-[9px] text-[12px] font-semibold transition-all border ${
+                          form.crew_size === n
+                            ? 'bg-[#fff7f2] border-[#f26a1b] text-[#f26a1b] shadow-[0_0_0_2px_rgba(242,106,27,0.15)]'
+                            : 'bg-white border-[#e5e5e7] text-[#6e6e73] hover:border-[#d1d1d6]'
+                        }`}
+                      >
+                        {n === 1 ? '1 Person' : '2 People'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               {/* Description — if category needs it */}

@@ -141,11 +141,13 @@ export type Database = {
           closed_at: string | null
           created_at: string | null
           created_by: string | null
+          crew_size: number | null
           customer_id: string
           description: string | null
           due_date: string | null
           id: string
           job_id: string | null
+          job_type: string | null
           next_action: string | null
           owner_user_id: string | null
           priority: Database["public"]["Enums"]["follow_up_priority"]
@@ -162,11 +164,13 @@ export type Database = {
           closed_at?: string | null
           created_at?: string | null
           created_by?: string | null
+          crew_size?: number | null
           customer_id: string
           description?: string | null
           due_date?: string | null
           id?: string
           job_id?: string | null
+          job_type?: string | null
           next_action?: string | null
           owner_user_id?: string | null
           priority?: Database["public"]["Enums"]["follow_up_priority"]
@@ -183,11 +187,13 @@ export type Database = {
           closed_at?: string | null
           created_at?: string | null
           created_by?: string | null
+          crew_size?: number | null
           customer_id?: string
           description?: string | null
           due_date?: string | null
           id?: string
           job_id?: string | null
+          job_type?: string | null
           next_action?: string | null
           owner_user_id?: string | null
           priority?: Database["public"]["Enums"]["follow_up_priority"]
