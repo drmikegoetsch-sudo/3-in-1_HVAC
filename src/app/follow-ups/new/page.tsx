@@ -19,7 +19,7 @@ import {
 
 /* ── Style tokens ── */
 const inputClass =
-  'w-full border border-[#d1d1d6] rounded-[10px] px-3.5 py-2.5 text-[14px] bg-white text-[#1d1d1f] placeholder:text-[#c7c7cc] focus:outline-none focus:ring-2 focus:ring-[#f26a1b]/25 focus:border-[#f26a1b] transition-all'
+  'w-full max-w-full border border-[#d1d1d6] rounded-[10px] px-3.5 py-2.5 text-[14px] bg-white text-[#1d1d1f] placeholder:text-[#c7c7cc] focus:outline-none focus:ring-2 focus:ring-[#f26a1b]/25 focus:border-[#f26a1b] transition-all'
 const selectClass =
   'w-full border border-[#d1d1d6] rounded-[10px] px-3.5 py-2.5 text-[14px] bg-white text-[#1d1d1f] focus:outline-none focus:ring-2 focus:ring-[#f26a1b]/25 focus:border-[#f26a1b] transition-all'
 const labelClass = 'block text-[12px] font-semibold text-[#6e6e73] mb-1.5 uppercase tracking-wide'
@@ -353,7 +353,8 @@ export default function NewFollowUpPage() {
                 />
               </div>
 
-              {/* ── Job Type + Crew Size ── */}
+              {/* ── Job Type + Crew Size — hidden for billing/payment/warranty ── */}
+              {!['billing', 'payment', 'warranty_registration'].includes(form.category) && (
               <div className="grid grid-cols-2 gap-4 pt-1">
                 {/* Job Type */}
                 <div>
@@ -397,6 +398,7 @@ export default function NewFollowUpPage() {
                   </div>
                 </div>
               </div>
+              )}
 
               {/* Description — if category needs it */}
               {visibleFields.includes('description') && (
@@ -429,12 +431,14 @@ export default function NewFollowUpPage() {
               {visibleFields.includes('due_date') && (
                 <div>
                   <label className={labelClass}>Due Date</label>
-                  <input
-                    className={inputClass}
-                    type="date"
-                    value={form.due_date}
-                    onChange={e => set('due_date', e.target.value)}
-                  />
+                  <div className="overflow-hidden rounded-[10px]">
+                    <input
+                      className={inputClass}
+                      type="date"
+                      value={form.due_date}
+                      onChange={e => set('due_date', e.target.value)}
+                    />
+                  </div>
                 </div>
               )}
 
@@ -565,12 +569,14 @@ export default function NewFollowUpPage() {
                   {!visibleFields.includes('due_date') && (
                     <div>
                       <label className={labelClass}>Due Date</label>
-                      <input
-                        className={inputClass}
-                        type="date"
-                        value={form.due_date}
-                        onChange={e => set('due_date', e.target.value)}
-                      />
+                      <div className="overflow-hidden rounded-[10px]">
+                        <input
+                          className={inputClass}
+                          type="date"
+                          value={form.due_date}
+                          onChange={e => set('due_date', e.target.value)}
+                        />
+                      </div>
                     </div>
                   )}
 
