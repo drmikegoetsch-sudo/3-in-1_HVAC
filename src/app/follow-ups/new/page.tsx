@@ -431,14 +431,12 @@ export default function NewFollowUpPage() {
               {visibleFields.includes('due_date') && (
                 <div>
                   <label className={labelClass}>Due Date</label>
-                  <div className="overflow-hidden rounded-[10px]">
-                    <input
-                      className={inputClass}
-                      type="date"
-                      value={form.due_date}
-                      onChange={e => set('due_date', e.target.value)}
-                    />
-                  </div>
+                  <input
+                    className={inputClass}
+                    type="date"
+                    value={form.due_date}
+                    onChange={e => set('due_date', e.target.value)}
+                  />
                 </div>
               )}
 
@@ -569,14 +567,12 @@ export default function NewFollowUpPage() {
                   {!visibleFields.includes('due_date') && (
                     <div>
                       <label className={labelClass}>Due Date</label>
-                      <div className="overflow-hidden rounded-[10px]">
-                        <input
-                          className={inputClass}
-                          type="date"
-                          value={form.due_date}
-                          onChange={e => set('due_date', e.target.value)}
-                        />
-                      </div>
+                      <input
+                        className={inputClass}
+                        type="date"
+                        value={form.due_date}
+                        onChange={e => set('due_date', e.target.value)}
+                      />
                     </div>
                   )}
 
